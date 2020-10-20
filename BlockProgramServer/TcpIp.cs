@@ -12,7 +12,9 @@ namespace BlockProgramServer
     class TcpIp
     {
         private TcpListener server = null;
-        private TcpIp(string bindIp, int bindPort)
+        private NetworkStream stream;
+        private List<UserInfo> users = null;
+        public TcpIp(string bindIp, int bindPort)
         {
             try
             {
@@ -25,32 +27,47 @@ namespace BlockProgramServer
                 Console.WriteLine(e);
             }
         }
-        public NetworkStream ConnectToClnt()
+        public void ServerOn()
         {
-            TcpClient clnt = server.AcceptTcpClient();
-            Console.WriteLine("클라이언트 접속 : {0}", ((IPEndPoint)clnt.Client.RemoteEndPoint).ToString());
-            NetworkStream stream = clnt.GetStream();
-            Console.WriteLine("클라이언트 Stream : {0}", stream.ToString());
-            return stream;
+            while(true)
+            {
+                //Socket sock = server.AcceptSocket();
+                TcpClient clnt = server.AcceptTcpClient();
+                Console.WriteLine("클라이언트 접속 : {0}", ((IPEndPoint)clnt.Client.RemoteEndPoint).ToString());
+                stream = clnt.GetStream();
+                UserInfo user = new UserInfo();
+                user.Sock = sock;
+                users.Add(user);
+                Console.WriteLine("클라이언트 Stream : {0}", stream.ToString());
+            }
         }
-        public void SendInt(NetworkStream stream,int num)
+        public void ReceiveThread()
+        {
+            int signal;
+
+        }
+        public void SendThread()
+        {
+
+        }
+        public void SendInt(int num)
         {
             byte[] data = BitConverter.GetBytes(num);
             stream.Write(data, 0, data.Length);
         }
-        public void SendStr(NetworkStream stream, string str)
+        public void SendStr(string str)
         {
             byte[] data = Encoding.UTF8.GetBytes(str);
             stream.Write(data, 0, data.Length);
         }
-        public int ReceiveInt(NetworkStream stream)
+        public int ReceiveInt()
         {
             byte[] data = new byte[sizeof(int)];
             stream.Read(data, 0, data.Length);
             int result = BitConverter.ToInt32(data, 0);
             return result;
         }
-        public string ReceiveStr(NetworkStream stream)
+        public string ReceiveStr()
         {
             byte[] data = new byte[512];
             stream.Read(data, 0, data.Length);

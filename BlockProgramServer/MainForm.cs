@@ -16,5 +16,11 @@ namespace BlockProgramServer
         {
             InitializeComponent();
         }
+
+        private void btnServOpen_Click(object sender, EventArgs e)
+        {
+            //서버 오픈 버튼
+
+        }
     }
 }
